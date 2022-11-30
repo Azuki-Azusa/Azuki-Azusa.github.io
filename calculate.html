@@ -11,57 +11,101 @@
 <body>
     <div id="app">
         <v-app>
-          <v-main>
-            <v-container>
-                <v-row>
-                    <v-col cols="4">
-                        <v-text-field label="敵の残りHP" suffix="万" type="number" v-model="rest"></v-text-field>
-                    </v-col>
-                    <v-col cols="4">
-                        <v-text-field label="ダメージA" suffix="万" type="number" v-model="damage_a"></v-text-field>
-                    </v-col>
-                    <v-col cols="4">
-                        <v-text-field label="ダメージB" suffix="万" type="number" v-model="damage_b"></v-text-field>
-                    </v-col>
-                </v-row>
-                <v-row v-if="damage_a && !damage_b">
-                    <v-col cols="6">
-                        <v-text-field label="フル持ち越し必要" suffix="万" :value="this.rest / (1 - 69 / 90)" readonly></v-text-field>
-                    </v-col>
-                    <v-col cols="6">
-                        <v-text-field label="持ち越し" suffix="秒" :value="(1 - this.rest / this.damage_a) * 90 + 20" readonly></v-text-field>
-                    </v-col>
-                </v-row>
-                <v-row v-if="damage_a && damage_b">
-                    <v-col cols="3">
-                        A->B
-                    </v-col>
-                    <v-col cols="3">
-                        <v-text-field label="A凸後敵残り" suffix="万" :value="this.rest - this.damage_a" readonly></v-text-field>
-                    </v-col>
-                    <v-col cols="3">
-                        <v-text-field label="A凸後フル持ち越し必要" suffix="万" :value="(this.rest - this.damage_a) / (1 - 69 / 90)" readonly></v-text-field>
-                    </v-col>
-                    <v-col cols="3">
-                        <v-text-field label="B持ち越し" suffix="秒" :value="(1 - (this.rest - this.damage_a) / this.damage_b) * 90 + 20" readonly></v-text-field>
-                    </v-col>
-                </v-row>
-                <v-row v-if="damage_a && damage_b">
-                    <v-col cols="3">
-                        B->A
-                    </v-col>
-                    <v-col cols="3">
-                        <v-text-field label="B凸後敵残り" suffix="万" :value="this.rest - this.damage_b" readonly></v-text-field>
-                    </v-col>
-                    <v-col cols="3">
-                        <v-text-field label="B凸後フル持ち越し必要" suffix="万" :value="(this.rest - this.damage_b) / (1 - 69 / 90)" readonly></v-text-field>
-                    </v-col>
-                    <v-col cols="3">
-                        <v-text-field label="A持ち越し" suffix="秒" :value="(1 - (this.rest - this.damage_b) / this.damage_a) * 90 + 20" readonly></v-text-field>
-                    </v-col>
-                </v-row>
-            </v-container>
-          </v-main>
+            <v-main>
+                <v-container>
+                    <v-tabs v-model="tab" align-with-title>
+                        <v-tabs-slider color="yellow"></v-tabs-slider>
+                        <v-tab v-for="item in tabs" :key="item">
+                            {{ item }}
+                        </v-tab>
+                    </v-tabs>
+                    <v-tabs-items v-model="tab">
+                        <v-tab-item :key="tabs[0]">
+                            <v-container>
+                                <v-row>
+                                    <v-col cols="4">
+                                        <v-text-field label="敵の残りHP" suffix="万" type="number" v-model="rest_hp">
+                                        </v-text-field>
+                                    </v-col>
+                                    <v-col cols="4">
+                                        <v-text-field label="ダメージA" suffix="万" type="number" v-model="damage_a">
+                                        </v-text-field>
+                                    </v-col>
+                                    <v-col cols="4">
+                                        <v-text-field label="ダメージB" suffix="万" type="number" v-model="damage_b">
+                                        </v-text-field>
+                                    </v-col>
+                                </v-row>
+                                <v-row v-if="damage_a && !damage_b">
+                                    <v-col cols="6">
+                                        <v-text-field label="フル持ち越し必要" suffix="万" :value="rest_hp / (1 - 69 / 90)"
+                                            readonly>
+                                        </v-text-field>
+                                    </v-col>
+                                    <v-col cols="6">
+                                        <v-text-field label="持ち越し" suffix="秒"
+                                            :value="Number(damage_a) > Number(rest_hp) ? (Math.min((1 - rest_hp / damage_a) * 90, 70) + 20) : 'なし'" readonly></v-text-field>
+                                    </v-col>
+                                </v-row>
+                                <v-row v-if="damage_a && damage_b">
+                                    <v-col cols="3">
+                                        A->B
+                                    </v-col>
+                                    <v-col cols="3">
+                                        <v-text-field label="A凸後敵残り" suffix="万" :value="rest_hp - damage_a" readonly>
+                                        </v-text-field>
+                                    </v-col>
+                                    <v-col cols="3">
+                                        <v-text-field label="A凸後フル持ち越し必要" suffix="万"
+                                            :value="(rest_hp - damage_a) / (1 - 69 / 90)" readonly></v-text-field>
+                                    </v-col>
+                                    <v-col cols="3">
+                                        <v-text-field label="B持ち越し" suffix="秒"
+                                            :value="Number(damage_b) > (rest_hp - damage_a) ? Math.min((1 - (rest_hp - damage_a) / damage_b) * 90, 70) + 20 : 'なし'" readonly>
+                                        </v-text-field>
+                                    </v-col>
+                                </v-row>
+                                <v-row v-if="damage_a && damage_b">
+                                    <v-col cols="3">
+                                        B->A
+                                    </v-col>
+                                    <v-col cols="3">
+                                        <v-text-field label="B凸後敵残り" suffix="万" :value="rest_hp - damage_b" readonly>
+                                        </v-text-field>
+                                    </v-col>
+                                    <v-col cols="3">
+                                        <v-text-field label="B凸後フル持ち越し必要" suffix="万"
+                                            :value="(rest_hp - damage_b) / (1 - 69 / 90)" readonly></v-text-field>
+                                    </v-col>
+                                    <v-col cols="3">
+                                        <v-text-field label="A持ち越し" suffix="秒"
+                                            :value="Number(damage_a) > (rest_hp - damage_b) ? Math.min((1 - (rest_hp - damage_b) / damage_a) * 90, 70) + 20 : 'なし'" readonly>
+                                        </v-text-field>
+                                    </v-col>
+                                </v-row>
+                            </v-container>
+                        </v-tab-item>
+                        <v-tab-item :key="tabs[1]">
+                            <v-row>
+                                <v-col>
+                                    <v-text-field label="持ち越し" suffix="秒" v-model="rest_time">
+                                    </v-text-field>
+                                </v-col>
+                            </v-row>
+                            <v-row>
+                                <v-col cols="6">
+                                    <v-textarea rows="10" label="手動順番を貼ってください" auto-grow v-model="note" @change="note_change">
+                                    </v-textarea>
+                                </v-col>
+                                <v-col cols="6">
+                                    <v-textarea rows="10" auto-grow :value="fixed_note" readonly>
+                                    </v-textarea>
+                                </v-col>
+                            </v-row>
+                        </v-tab-item>
+                    </v-tabs-items>
+                </v-container>
+            </v-main>
         </v-app>
     </div>
 
@@ -70,18 +114,34 @@
     <script src="https://cdn.jsdelivr.net/npm/vue@2.x/dist/vue.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/vuetify@2.x/dist/vuetify.js"></script>
     <script>
-        new Vue({
+        var vm = new Vue({
             el: '#app',
             vuetify: new Vuetify(),
-            data () {
+            data() {
                 return {
+                    // tabs: ['連携計算', '持越時間修正'],
+                    tabs: ['連携計算'],
+                    tab: '連携計算',
                     damage_a: 0,
                     damage_b: 0,
-                    rest: 0,
+                    rest_hp: 0,
+                    rest_time: 90,
+                    note: '',
+                    fixed_note: ''
                 }
             },
             methods: {
-
+                note_change() {
+                    this.fixed_note = '';
+                    let notes = this.note.split('\n');
+                    notes.forEach(element => {
+                        this.fixed_note += this.fix_string(element) + '\n';
+                    });
+                    console.log(this.fixed_note);
+                },
+                fix_string(str) {
+                    return str + 'test';
+                },
             },
         });
     </script>
