@@ -88,7 +88,7 @@
                         <v-tab-item :key="tabs[1]">
                             <v-row>
                                 <v-col>
-                                    <v-text-field label="持ち越し" suffix="秒" v-model="rest_time">
+                                    <v-text-field label="持ち越し" suffix="秒" v-model="rest_time" @change="note_change">
                                     </v-text-field>
                                 </v-col>
                             </v-row>
@@ -119,8 +119,7 @@
             vuetify: new Vuetify(),
             data() {
                 return {
-                    // tabs: ['連携計算', '持越時間修正'],
-                    tabs: ['連携計算'],
+                    tabs: ['連携計算', '持越時間修正'],
                     tab: '連携計算',
                     damage_a: 0,
                     damage_b: 0,
@@ -137,11 +136,34 @@
                     notes.forEach(element => {
                         this.fixed_note += this.fix_string(element) + '\n';
                     });
-                    console.log(this.fixed_note);
                 },
                 fix_string(str) {
-                    return str + 'test';
+                    let time = '';
+                    let temp = 0;
+                    console.log(str.charAt(0));
+                    for (var i = 0; i < str.length; i++) {
+                        if (this.isNumber(str.charAt(i))) time += str.charAt(i);
+                        else if (str.charAt(i) == ':' || str.charAt(i) == '：' || str.charAt(i) == ' ') continue;
+                        else {
+                            temp = i;
+                            break;
+                        }
+                    }
+                    if (time.length == 0) {
+                        return str;
+                    }
+                    else {
+                        time = Number(time);
+                        if (time > 100) time -= 40;
+                        time -= (90 - this.rest_time);
+                        if (time >= 60) return '1:' + (time - 60 + '').padStart(2, '0') + ' ' + str.substr(temp);
+                        else if (time >= 0) return '0:' + (time + '').padStart(2, '0') + ' ' + str.substr(temp);
+                        else return '';
+                    }
                 },
+                isNumber(char) {
+                    return !isNaN(char) && !isNaN(parseFloat(char));
+                }
             },
         });
     </script>
