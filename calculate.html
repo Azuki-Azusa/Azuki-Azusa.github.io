@@ -140,7 +140,6 @@
                 fix_string(str) {
                     let time = '';
                     let temp = 0;
-                    console.log(str.charAt(0));
                     for (var i = 0; i < str.length; i++) {
                         if (this.isNumber(str.charAt(i))) time += str.charAt(i);
                         else if (str.charAt(i) == ':' || str.charAt(i) == '：' || str.charAt(i) == ' ') continue;
